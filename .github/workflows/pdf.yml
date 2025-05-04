@@ -23,10 +23,14 @@ jobs:
           mkdir merged_pdfs
           pdftk *.pdf cat output merged_pdfs/merged.pdf  # Merge all PDFs in the repo
 
-      - name: Commit and push merged PDF
+      - name: Delete original PDFs
+        run: |
+          rm -f *.pdf  # Remove all original PDFs
+
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add merged_pdfs/merged.pdf
-          git commit -m "Merged PDFs" || echo "No changes to commit"
+          git commit -m "Merged PDFs and deleted originals" || echo "No changes to commit"
           git push
