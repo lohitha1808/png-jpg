@@ -26,7 +26,7 @@ jobs:
 
       - name: Delete original PDFs
         run: |
-          rm -f *.pdf  # Remove all original PDFs
+          rm -f *.pdf  # Delete all original PDFs after merging
 
       - name: Commit and push changes
         run: |
