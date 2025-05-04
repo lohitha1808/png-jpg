@@ -20,8 +20,9 @@ jobs:
 
       - name: Merge PDFs
         run: |
-          mkdir merged_pdfs
-          pdftk *.pdf cat output merged_pdfs/merged.pdf  # Merge all PDFs in the repo
+          # Create or clean up merged_pdfs directory
+          mkdir -p merged_pdfs
+          pdftk *.pdf cat output merged_pdfs/merged.pdf  # Merge all PDFs into merged.pdf
 
       - name: Delete original PDFs
         run: |
