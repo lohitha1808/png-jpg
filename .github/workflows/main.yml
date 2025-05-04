@@ -3,7 +3,7 @@ name: Convert PNG to JPG
 on:
   push:
     paths:
-      - '.png'
+      - '**/*.png'
 
 jobs:
   convert-images:
