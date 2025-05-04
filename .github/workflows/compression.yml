@@ -1,0 +1,40 @@
+name: Compress Images
+
+on:
+  push:
+    paths:
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.png'
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install imagemin-cli and plugins
+        run: |
+          npm install -g imagemin-cli imagemin-mozjpeg imagemin-pngquant
+
+      - name: Compress Images
+        run: |
+          mkdir -p compressed
+          npx imagemin "**/*.{jpg,jpeg,png}" --plugin=mozjpeg --plugin=pngquant --out-dir=compressed
+          rsync -a compressed/ ./
+          rm -r compressed
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Compressed images" || echo "No changes to commit"
+          git push
