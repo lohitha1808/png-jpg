@@ -1,4 +1,4 @@
-name: Convert PNG to JPG
+name: Convert and Compress Images
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - '**/*.png'
 
 jobs:
-  convert-images:
+  convert-and-compress:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Install ImageMagick
@@ -23,11 +23,27 @@ jobs:
             convert "$img" "$new_img" && rm "$img"
           done
 
-      - name: Commit converted JPGs
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install imagemin-cli and plugins
+        run: |
+          npm install -g imagemin-cli imagemin-mozjpeg
+
+      - name: Compress JPG and JPEG images
+        run: |
+          mkdir -p compressed
+          npx imagemin "**/*.{jpg,jpeg}" --plugin=mozjpeg --out-dir=compressed
+          rsync -a compressed/ ./
+          rm -r compressed
+
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git pull origin main --rebase
           git add .
-          git commit -m "Convert PNGs to JPGs" || echo "No changes to commit"
+          git diff --staged --quiet || git commit -m "Convert PNGs to JPGs and compress images"
           git push
