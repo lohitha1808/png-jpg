@@ -15,7 +15,7 @@ jobs:
       - name: Create Pull Request to main
         uses: devops-infra/action-pull-request@v0.5.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.SECRET_TOKEN }}
           source_branch: dev
           target_branch: main
           title: '🚀 Auto PR: Sync dev → main'
