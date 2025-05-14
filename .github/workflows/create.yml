@@ -1,24 +1,31 @@
-name: Auto PR from dev to main
+name: Auto Merge dev into main
 
 on:
-  push:
-    branches:
-      - dev
+  schedule:
+    - cron: '0 7 * * *'  # 7:00 PM UTC = 12:30 AM IST
+  workflow_dispatch:       # Optional: allows manual runs from the GitHub UI
 
 jobs:
-  create-pr:
+  merge:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Create Pull Request to main
-        uses: devops-infra/action-pull-request@v0.5.0
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.SECRET_TOKEN }}
-          source_branch: dev
-          target_branch: main
-          title: '🚀 Auto PR: Sync dev → main'
-          body: |
-            This PR was created automatically from a push to the `dev` branch.
-            Please review and merge when ready.
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge dev into main
+        run: |
+          git fetch origin dev
+          git merge origin/dev --no-ff --commit -m "🔄 Scheduled auto-merge dev into main"
+          git push origin main
